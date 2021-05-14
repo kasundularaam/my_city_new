@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_city/src/widgets/custom_listtile.dart';
+import 'package:my_city/src/widgets/page_title.dart';
 import 'package:my_city/src/widgets/small_button.dart';
+import 'package:my_city/src/widgets/text_list_tile.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -8,223 +10,188 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool tunOnNotification = false;
-  bool turnLocationFunction = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff21254A),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 50.0,
-            horizontal: 20.0,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        physics: const BouncingScrollPhysics(),
+        children: [
+          SizedBox(height: 50),
+          PageTitle(title: "Profile", fontSize: 38),
+          SizedBox(
+            height: 20.0,
           ),
-          child: Column(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Text(
-                "Profile",
-                style: TextStyle(
-                  fontSize: 38.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              SizedBox(
+                width: 110,
+                height: 110,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(65),
+                      child: Container(
+                        color: Colors.white,
+                        width: 110,
+                        height: 110,
+                      ),
+                    ),
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(60),
+                        child: Image.network(
+                          "https://images.pexels.com/photos/2078265/pexels-photo-2078265.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
-                height: 20.0,
+                width: 20.0,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    height: 120.0,
-                    width: 120.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(60.0),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 3.0,
-                          offset: Offset(0, 4.0),
-                          color: Colors.black38,
-                        )
-                      ],
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/img.png"),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  Text(
+                    "Kasun Dulara",
+                    style: TextStyle(
+                        fontSize: 22.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
-                    width: 10.0,
+                    height: 10.0,
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "Desan Pathirana",
-                        style: TextStyle(fontSize: 16.0, color: Colors.white),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        "1234567890",
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      SmallButton(
-                        btnText: "Edit",
-                      ),
-                    ],
+                  Text(
+                    "200129001050",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(
-                height: 30.0,
-              ),
-              Text(
-                "Account",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Card(
-                elevation: 3.0,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: <Widget>[
-                      CustomListTile(
-                        icon: Icons.location_on,
-                        text: "Location",
-                      ),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      ),
-                      CustomListTile(
-                        icon: Icons.visibility,
-                        text: "Change Password",
-                      ),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 30.0,
-              ),
-              Text(
-                "Notifications",
-                style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Card(
-                elevation: 3.0,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text("App Notification"),
-                          Switch(
-                            value: tunOnNotification,
-                            onChanged: (bool value) {
-                              setState(() {
-                                tunOnNotification = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text("Location Tracking"),
-                          Switch(
-                            value: turnLocationFunction,
-                            onChanged: (bool val) {
-                              setState(() {
-                                turnLocationFunction = val;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 30.0,
-              ),
-              Text(
-                "Other",
-                style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "Language",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                        // SizedBox(height:10.0,),
-                        Divider(
-                          height: 30.0,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
-        ),
+          SizedBox(
+            height: 30.0,
+          ),
+          Text(
+            "Personal info",
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextListTile(
+                    title: "Name",
+                    subTitle: "Kasun Dulara",
+                  ),
+                  Divider(
+                    height: 15.0,
+                    color: Colors.purple,
+                  ),
+                  TextListTile(
+                    title: "NIC",
+                    subTitle: "200129001050",
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 30.0,
+          ),
+          Text(
+            "Area info",
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextListTile(
+                    title: "Admin Area",
+                    subTitle: "Kegalle",
+                  ),
+                  Divider(
+                    height: 15.0,
+                    color: Colors.purple,
+                  ),
+                  TextListTile(
+                    title: "Postal Code",
+                    subTitle: "7100",
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 30.0,
+          ),
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                print("loged out");
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.logout,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    Text(
+                      "log out",
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 30.0,
+          ),
+        ],
       ),
     );
   }
