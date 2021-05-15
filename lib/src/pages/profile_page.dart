@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:my_city/src/widgets/custom_listtile.dart';
+import 'package:my_city/src/models/user_modal.dart';
+import 'package:my_city/src/pages/login.dart';
+import 'package:my_city/src/socpe%20model/user_model.dart';
 import 'package:my_city/src/widgets/page_title.dart';
-import 'package:my_city/src/widgets/small_button.dart';
 import 'package:my_city/src/widgets/text_list_tile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -10,8 +12,16 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  UserModel _userModel = UserModel();
+  String _userId;
+  getUid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getString("uid");
+  }
+
   @override
   Widget build(BuildContext context) {
+    getUid();
     return Scaffold(
       backgroundColor: Color(0xff21254A),
       body: ListView(
@@ -57,104 +67,148 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 width: 20.0,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Text(
-                    "Kasun Dulara",
-                    style: TextStyle(
-                        fontSize: 22.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(
-                    "200129001050",
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              FutureBuilder(
+                future: _userModel.getUserById(_userId),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "${snapshot.error}",
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData) {
+                    User user = snapshot.data;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        Text(
+                          user.Name,
+                          style: TextStyle(
+                              fontSize: 22.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          user.NIC,
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return Center(child: CircularProgressIndicator());
+                },
               ),
             ],
           ),
           SizedBox(
             height: 30.0,
           ),
-          Text(
-            "Personal info",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  TextListTile(
-                    title: "Name",
-                    subTitle: "Kasun Dulara",
+          FutureBuilder(
+            future: _userModel.getUserById(_userId),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                    child: Text(
+                  "${snapshot.error}",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.white,
                   ),
-                  Divider(
-                    height: 15.0,
-                    color: Colors.purple,
-                  ),
-                  TextListTile(
-                    title: "NIC",
-                    subTitle: "200129001050",
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 30.0,
-          ),
-          Text(
-            "Area info",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  TextListTile(
-                    title: "Admin Area",
-                    subTitle: "Kegalle",
-                  ),
-                  Divider(
-                    height: 15.0,
-                    color: Colors.purple,
-                  ),
-                  TextListTile(
-                    title: "Postal Code",
-                    subTitle: "7100",
-                  ),
-                ],
-              ),
-            ),
+                ));
+              }
+              if (snapshot.hasData) {
+                User user = snapshot.data;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Personal info",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            TextListTile(
+                              title: "Name",
+                              subTitle: user.Name,
+                            ),
+                            Divider(
+                              height: 15.0,
+                              color: Colors.purple,
+                            ),
+                            TextListTile(
+                              title: "NIC",
+                              subTitle: user.NIC,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30.0,
+                    ),
+                    Text(
+                      "Area info",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            TextListTile(
+                              title: "Admin Area",
+                              subTitle: user.AdminArea,
+                            ),
+                            Divider(
+                              height: 15.0,
+                              color: Colors.purple,
+                            ),
+                            TextListTile(
+                              title: "Postal Code",
+                              subTitle: "${user.PostalCode}",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return Center(child: CircularProgressIndicator());
+            },
           ),
           SizedBox(
             height: 30.0,
@@ -162,6 +216,8 @@ class _ProfilePageState extends State<ProfilePage> {
           Center(
             child: GestureDetector(
               onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LogScreen()));
                 print("loged out");
               },
               child: Padding(

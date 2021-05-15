@@ -3,13 +3,11 @@ import 'package:my_city/src/pages/issue_select.dart';
 
 class RoadTypeCard extends StatefulWidget {
   final String roadType;
-  final int postalCode;
   final double height;
   final double width;
   const RoadTypeCard({
     Key key,
     @required this.roadType,
-    @required this.postalCode,
     @required this.height,
     @required this.width,
   }) : super(key: key);
@@ -35,8 +33,7 @@ class _RoadTypeCardState extends State<RoadTypeCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => IssueSelect(
-                roadType: widget.roadType, postalCode: widget.postalCode),
+            builder: (context) => IssueSelect(roadType: widget.roadType),
           ),
         );
       },

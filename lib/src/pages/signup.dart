@@ -7,6 +7,7 @@ import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
 import 'package:my_city/src/widgets/page_title.dart';
 import 'package:my_city/src/widgets/round_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/input_field.dart';
 import 'login.dart';
 
@@ -62,29 +63,24 @@ class _SignUpState extends State<SignUp> {
     );
 
     try {
-      _userModel.addUser(_user).then((response) {
-        if (response.statusCode == 201) {
-          User newUser = userFromJson(response.body);
-          CustomLoading.closeLoading(context: context);
-          print(
-              "added user: ${userFromJson(response.body).Id} ${userFromJson(response.body).Name}");
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => MainScreen(
-                currentUser: newUser,
-              ),
-            ),
-          );
-        } else {
-          CustomLoading.closeLoading(context: context);
-          CustomAlert.alertDialogBuilder(
-            context: context,
-            title: "Error",
-            message: "error code: ${response.statusCode}",
-            action: "Ok",
-          );
-        }
-      });
+      String userId = await _userModel.signUpUser(_user);
+      if (userId != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("uid", userId);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => MainScreen(),
+          ),
+        );
+      } else {
+        CustomLoading.closeLoading(context: context);
+        CustomAlert.alertDialogBuilder(
+          context: context,
+          title: "Error",
+          message: "something went wrong",
+          action: "Ok",
+        );
+      }
     } catch (e) {
       CustomLoading.closeLoading(context: context);
       CustomAlert.alertDialogBuilder(

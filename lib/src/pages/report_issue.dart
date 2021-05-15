@@ -5,24 +5,11 @@ import 'package:my_city/src/widgets/page_title.dart';
 import 'package:my_city/src/widgets/road_type_card.dart';
 
 class ReportIssue extends StatefulWidget {
-  final User currentUser;
-  const ReportIssue({
-    Key key,
-    @required this.currentUser,
-  }) : super(key: key);
-
   @override
   _ReportIssueState createState() => _ReportIssueState();
 }
 
 class _ReportIssueState extends State<ReportIssue> {
-  int _postalCode;
-  @override
-  void initState() {
-    _postalCode = widget.currentUser.PostalCode;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +27,6 @@ class _ReportIssueState extends State<ReportIssue> {
             width: MediaQuery.of(context).size.width,
             height: (MediaQuery.of(context).size.width / 2) * 1.2,
             roadType: "normal road",
-            postalCode: _postalCode,
           ),
           SizedBox(
             height: 20.0,
@@ -49,7 +35,6 @@ class _ReportIssueState extends State<ReportIssue> {
             width: MediaQuery.of(context).size.width,
             height: (MediaQuery.of(context).size.width / 2) * 1.2,
             roadType: "highway",
-            postalCode: _postalCode,
           ),
         ],
       ),

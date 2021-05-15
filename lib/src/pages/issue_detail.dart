@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:my_city/src/models/issue_modal.dart';
 import 'package:my_city/src/models/location_modal.dart';
+import 'package:my_city/src/models/user_modal.dart';
 import 'package:my_city/src/socpe%20model/issue_model.dart';
+import 'package:my_city/src/socpe%20model/user_model.dart';
 import 'package:my_city/src/widgets/custom_alert.dart';
 import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
@@ -14,16 +16,15 @@ import 'package:my_city/src/widgets/select_admin_area_card.dart';
 import 'package:my_city/src/widgets/select_image_card.dart';
 import 'package:my_city/src/widgets/select_location_card.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IssueDetails extends StatefulWidget {
   final int issueType;
   final String roadType;
-  final int postalCode;
   const IssueDetails({
     Key key,
     @required this.issueType,
     @required this.roadType,
-    @required this.postalCode,
   }) : super(key: key);
 
   @override
@@ -32,10 +33,12 @@ class IssueDetails extends StatefulWidget {
 
 class _IssueDetailsState extends State<IssueDetails> {
   IssueModel _issueModel = IssueModel();
+  UserModel _userModel = UserModel();
   File _issueImage;
   MyLocationData _myLocationData;
-  String _adminArea;
+  String _adminArea = "Kottawa";
   BuildContext _showLoadingDialogContext;
+  String _userId;
 
   Future<Issue> readyIssueToUpload() async {
     Issue thisIssue;
@@ -53,6 +56,7 @@ class _IssueDetailsState extends State<IssueDetails> {
 
     final now = new DateTime.now();
     List<int> imageBytes = await _issueImage.readAsBytesSync();
+    User user = await _userModel.getUserById(_userId);
 
     thisDate = DateFormat('y/d/M').format(now);
     thisBase64Image = base64Encode(imageBytes);
@@ -62,7 +66,7 @@ class _IssueDetailsState extends State<IssueDetails> {
     thisAdminArea = _adminArea;
     thisIssueType = widget.issueType;
     thisRoadType = widget.roadType;
-    thisPostalCode = widget.postalCode;
+    thisPostalCode = user.PostalCode;
 
     thisIssue = Issue(
       Image: thisBase64Image,
@@ -124,8 +128,7 @@ class _IssueDetailsState extends State<IssueDetails> {
         _myLocationData.Long != null &&
         _adminArea != null &&
         widget.issueType != null &&
-        widget.roadType != null &&
-        widget.postalCode != null) {
+        widget.roadType != null) {
       CustomLoading.showLoadingDialog(
         context: context,
         message: "Reporting your issue...",
@@ -141,8 +144,14 @@ class _IssueDetailsState extends State<IssueDetails> {
     }
   }
 
+  getUid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getString("uid");
+  }
+
   @override
   Widget build(BuildContext context) {
+    getUid();
     return Scaffold(
       backgroundColor: Color(0xff21254A),
       body: Stack(

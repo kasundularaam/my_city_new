@@ -6,18 +6,12 @@ import 'package:my_city/src/pages/profile_page.dart';
 import 'package:my_city/src/pages/report_issue.dart';
 
 class MainScreen extends StatefulWidget {
-  final User currentUser;
-  const MainScreen({
-    Key key,
-    @required this.currentUser,
-  }) : super(key: key);
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int currentTabIndex = 0;
-  User _currentUser;
 
   List<Widget> pages;
   Widget currentpage;
@@ -28,10 +22,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
-    _currentUser = widget.currentUser;
     super.initState();
-    homePage = HomePage(currentUser: _currentUser);
-    reportIssuePage = ReportIssue(currentUser: _currentUser);
+    homePage = HomePage();
+    reportIssuePage = ReportIssue();
     profilePage = ProfilePage();
 
     pages = [homePage, reportIssuePage, profilePage];

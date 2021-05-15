@@ -8,6 +8,7 @@ import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
 import 'package:my_city/src/widgets/page_title.dart';
 import 'package:my_city/src/widgets/round_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/input_field.dart';
 
 class LogScreen extends StatefulWidget {
@@ -18,7 +19,6 @@ class LogScreen extends StatefulWidget {
 class _LogScreenState extends State<LogScreen> {
   BuildContext showLoadingDialogContext;
   UserModel _userModel = UserModel();
-  User _loginUser = User();
 
   String _loginNIC = "";
   String _loginPassword = "";
@@ -44,31 +44,16 @@ class _LogScreenState extends State<LogScreen> {
 
   Future _loginAccount() async {
     try {
-      List<User> userList = await _userModel.getUserByNIC(_loginNIC);
+      String userId = await _userModel.loginUser(_loginNIC, _loginPassword);
 
-      if (userList.isNotEmpty) {
-        CustomLoading.closeLoading(context: context);
-        _loginUser = userList[0];
-
-        if (_loginUser != null) {
-          if (_loginUser.Password == _loginPassword) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => MainScreen(
-                  currentUser: _loginUser,
-                ),
-              ),
-            );
-          } else {
-            CustomLoading.closeLoading(context: context);
-            CustomAlert.alertDialogBuilder(
-              context: context,
-              title: "Error",
-              message: "wrong Password please try again..!",
-              action: "Ok",
-            );
-          }
-        }
+      if (userId != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("uid", userId);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => MainScreen(),
+          ),
+        );
       } else {
         CustomLoading.closeLoading(context: context);
         CustomAlert.alertDialogBuilder(
@@ -79,7 +64,12 @@ class _LogScreenState extends State<LogScreen> {
         );
       }
     } catch (e) {
-      print("error: $e");
+      CustomAlert.alertDialogBuilder(
+        context: context,
+        title: "Error",
+        message: "$e",
+        action: "Ok",
+      );
     }
   }
 

@@ -6,11 +6,9 @@ import '../widgets/issue_type_card.dart';
 
 class IssueSelect extends StatefulWidget {
   final String roadType;
-  final int postalCode;
   const IssueSelect({
     Key key,
     @required this.roadType,
-    @required this.postalCode,
   }) : super(key: key);
 
   @override
@@ -43,12 +41,10 @@ class _IssueSelectState extends State<IssueSelect> {
                   IssueTypeCard(
                     id: 1,
                     roadType: widget.roadType,
-                    postalCode: widget.postalCode,
                   ),
                   IssueTypeCard(
                     id: 2,
                     roadType: widget.roadType,
-                    postalCode: widget.postalCode,
                   ),
                 ],
               ),
@@ -57,12 +53,10 @@ class _IssueSelectState extends State<IssueSelect> {
                   IssueTypeCard(
                     id: 3,
                     roadType: widget.roadType,
-                    postalCode: widget.postalCode,
                   ),
                   IssueTypeCard(
                     id: 4,
                     roadType: widget.roadType,
-                    postalCode: widget.postalCode,
                   ),
                 ],
               ),

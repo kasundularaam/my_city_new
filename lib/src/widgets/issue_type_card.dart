@@ -5,12 +5,10 @@ import 'package:my_city/src/pages/issue_detail.dart';
 class IssueTypeCard extends StatefulWidget {
   final int id;
   final String roadType;
-  final int postalCode;
   const IssueTypeCard({
     Key key,
     @required this.id,
     @required this.roadType,
-    @required this.postalCode,
   }) : super(key: key);
 
   @override
@@ -98,7 +96,6 @@ class _IssueTypeCardState extends State<IssueTypeCard> {
             builder: (context) => IssueDetails(
               issueType: widget.id,
               roadType: widget.roadType,
-              postalCode: widget.postalCode,
             ),
           ),
         );

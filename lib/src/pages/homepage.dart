@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_city/src/models/issue_modal.dart';
-import 'package:my_city/src/models/user_modal.dart';
 import 'package:my_city/src/socpe%20model/issue_model.dart';
 import 'package:my_city/src/widgets/issue_card.dart';
 import 'package:my_city/src/widgets/page_title.dart';
 
 class HomePage extends StatefulWidget {
-  final User currentUser;
-  const HomePage({
-    Key key,
-    @required this.currentUser,
-  }) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
 }
