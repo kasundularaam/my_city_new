@@ -113,21 +113,14 @@ class IssueService {
 
   Future<bool> isApproved(String issueId) async {
     Issue issue = await getIssueById(issueId);
-    print("get is approved = ${issue.status}");
-    if (issue.status == "approved") {
+    if (issue.status == "Approved") {
       return true;
     } else {
       return false;
     }
   }
 
-  Future<bool> updateStatus(String issueId, bool isApprove) async {
-    String status;
-    if (isApprove) {
-      status = "approved";
-    } else {
-      status = "initial";
-    }
+  Future<bool> updateStatus(String issueId) async {
     try {
       String url =
           "https://hivi-99-apigateway-gww2g.ondigitalocean.app/Issue/$issueId";
@@ -135,8 +128,6 @@ class IssueService {
       final http.Response response = await http.put(
         Uri.parse(url),
       );
-      print("response body ${response.body}");
-      print("status code ${response.statusCode}");
       if (response.statusCode == 200) {
         return true;
       } else {

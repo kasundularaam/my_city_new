@@ -100,18 +100,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Issue>> getIssuesForUser() async {
-    List<Issue> issueList;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _userId = prefs.getString("uid");
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      _userId = prefs.getString("uid");
       _user = await _userService.getUserById(_userId);
       String adminArea = _user.area;
-      // issueList = await _issueService.getIssuesByAdminArea("Kottawa");
-      issueList = await _issueService.getIssuesByAdminArea(adminArea);
+      List<Issue> issueList =
+          await _issueService.getIssuesByAdminArea(adminArea);
+      List<Issue> filterdList = [];
+      issueList.forEach((issue) {
+        if (issue.status != "Approved") {
+          filterdList.add(issue);
+        }
+      });
+      return filterdList;
     } catch (e) {
-      print("error: $e");
+      throw Exception("$e");
     }
-    return issueList;
   }
 
   @override

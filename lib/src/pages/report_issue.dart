@@ -36,6 +36,9 @@ class _ReportIssueState extends State<ReportIssue> {
             height: (MediaQuery.of(context).size.width / 2) * 1.2,
             roadType: "highway",
           ),
+           SizedBox(
+            height: 20.0,
+          ),
         ],
       ),
     );

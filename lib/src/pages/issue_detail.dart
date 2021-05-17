@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:my_city/src/models/issue_modal.dart';
 import 'package:my_city/src/models/location_modal.dart';
 import 'package:my_city/src/models/user_modal.dart';
+import 'package:my_city/src/screens/main_screen.dart';
 import 'package:my_city/src/services/issue_service.dart';
 import 'package:my_city/src/services/user_service.dart';
 import 'package:my_city/src/widgets/custom_alert.dart';
@@ -37,7 +38,6 @@ class _IssueDetailsState extends State<IssueDetails> {
   File _issueImage;
   MyLocationData _myLocationData;
   String _adminArea = "Kottawa";
-  BuildContext _showLoadingDialogContext;
 
   Future<Issue> readyIssueToUpload() async {
     Issue thisIssue;
@@ -72,18 +72,14 @@ class _IssueDetailsState extends State<IssueDetails> {
       Issue myIssue = await readyIssueToUpload();
       _issueService.addIssue(myIssue).then((response) {
         if (response.statusCode == 201) {
-          Issue newIssue = issueFromJson(response.body);
           CustomLoading.closeLoading(context: context);
-          CustomAlert.alertDialogBuilder(
-            context: context,
-            title: "Success",
-            message: "Your issue reported successfully",
-            action: "ok",
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => MainScreen(),
+            ),
+            (route) => false,
           );
-          print(newIssue.id);
-          print(newIssue.location);
-          print(newIssue.image);
-          Navigator.of(context).pop();
         } else {
           CustomLoading.closeLoading(context: context);
           CustomAlert.alertDialogBuilder(

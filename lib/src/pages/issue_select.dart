@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_city/src/screens/main_screen.dart';
 import 'package:my_city/src/widgets/page_background.dart';
 import 'package:my_city/src/widgets/page_title.dart';
 
@@ -59,6 +60,48 @@ class _IssueSelectState extends State<IssueSelect> {
                     roadType: widget.roadType,
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => MainScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home_outlined,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "back to home",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 40,
               ),
             ],
           )

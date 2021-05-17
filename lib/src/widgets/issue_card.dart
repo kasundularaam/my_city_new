@@ -55,17 +55,9 @@ class _IssueItemCardState extends State<IssueItemCard> {
       if (likeCount >= _approveCount) {
         if (!isApproved) {
           print("IsApproved false");
-          bool updated = await _issueService.updateStatus(_issue.id, true);
+          bool updated = await _issueService.updateStatus(_issue.id);
           if (updated) {
             print("status updated Status = Approved");
-          }
-        }
-      } else {
-        if (isApproved) {
-          print("IsApproved true");
-          bool updated = await _issueService.updateStatus(_issue.id, false);
-          if (updated) {
-            print("status updated Status = Initial");
           }
         }
       }

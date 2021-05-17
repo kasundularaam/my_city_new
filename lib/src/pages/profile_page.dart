@@ -290,7 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
               if (snapshot.hasError) {
                 return Center(
                     child: Text(
-                  "${snapshot.error}",
+                  "you have not reported any issue yet",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16.0,
