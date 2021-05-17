@@ -6,40 +6,36 @@ String userToJson(User data) => json.encode(data.toJson());
 
 class User {
   User({
-    this.Id,
-    this.Name,
-    this.NIC,
-    this.Password,
-    this.Type,
-    this.AdminArea,
-    this.PostalCode,
+    this.id,
+    this.name,
+    this.nic,
+    this.password,
+    this.postalCode,
+    this.area,
   });
 
-  String Id;
-  String Name;
-  String NIC;
-  String Password;
-  String Type;
-  String AdminArea;
-  int PostalCode;
+  String id;
+  String name;
+  String nic;
+  String password;
+  int postalCode;
+  String area;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        Id: json["id"],
-        Name: json["name"],
-        NIC: json["nic"],
-        Password: json["password"],
-        Type: json["type"],
-        AdminArea: json["area"],
-        PostalCode: json["postalCode"],
+        id: json["id"],
+        name: json["name"],
+        nic: json["nic"],
+        password: json["password"],
+        postalCode: json["postalCode"],
+        area: json["area"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": Id,
-        "name": Name,
-        "nic": NIC,
-        "password": Password,
-        "type": Type,
-        "area": AdminArea,
-        "postalCode": PostalCode,
+        "id": id,
+        "name": name,
+        "nic": nic,
+        "password": password,
+        "postalCode": postalCode,
+        "area": area,
       };
 }

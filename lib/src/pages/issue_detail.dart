@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:my_city/src/models/issue_modal.dart';
 import 'package:my_city/src/models/location_modal.dart';
 import 'package:my_city/src/models/user_modal.dart';
-import 'package:my_city/src/socpe%20model/issue_model.dart';
-import 'package:my_city/src/socpe%20model/user_model.dart';
+import 'package:my_city/src/services/issue_service.dart';
+import 'package:my_city/src/services/user_service.dart';
 import 'package:my_city/src/widgets/custom_alert.dart';
 import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
@@ -32,73 +32,57 @@ class IssueDetails extends StatefulWidget {
 }
 
 class _IssueDetailsState extends State<IssueDetails> {
-  IssueModel _issueModel = IssueModel();
-  UserModel _userModel = UserModel();
+  IssueService _issueService = IssueService();
+  UserService _userService = UserService();
   File _issueImage;
   MyLocationData _myLocationData;
   String _adminArea = "Kottawa";
   BuildContext _showLoadingDialogContext;
-  String _userId;
 
   Future<Issue> readyIssueToUpload() async {
     Issue thisIssue;
 
-    String thisBase64Image;
-    double thisLat;
-    double thisLong;
-    int thisPostalCode;
-    String thisLocation;
-    String thisStatus = "initial";
-    String thisDate;
-    String thisRoadType;
-    int thisIssueType;
-    String thisAdminArea;
-
     final now = new DateTime.now();
     List<int> imageBytes = await _issueImage.readAsBytesSync();
-    User user = await _userModel.getUserById(_userId);
-
-    thisDate = DateFormat('y/d/M').format(now);
-    thisBase64Image = base64Encode(imageBytes);
-    thisLocation = _myLocationData.Address;
-    thisLat = _myLocationData.Lat;
-    thisLong = _myLocationData.Long;
-    thisAdminArea = _adminArea;
-    thisIssueType = widget.issueType;
-    thisRoadType = widget.roadType;
-    thisPostalCode = user.PostalCode;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString("uid");
+    User user = await _userService.getUserById(userId);
 
     thisIssue = Issue(
-      Image: thisBase64Image,
-      Lat: thisLat,
-      Long: thisLong,
-      PostalCode: thisPostalCode,
-      Location: thisLocation,
-      Status: thisStatus,
-      Date: thisDate,
-      RoadType: thisRoadType,
-      IssueType: thisIssueType,
-      AdminArea: thisAdminArea,
-    );
+        image: base64Encode(imageBytes),
+        lat: _myLocationData.Lat,
+        long: _myLocationData.Long,
+        postalCode: user.postalCode,
+        location: _myLocationData.Address,
+        status: "initial",
+        date: DateFormat('y/d/M').format(now),
+        roadType: widget.roadType,
+        issueType: widget.issueType,
+        adminArea: _adminArea,
+        uid: userId);
     return thisIssue;
   }
 
   Future addNewIssue() async {
     try {
+      CustomLoading.showLoadingDialog(
+        context: context,
+        message: "Reporting your issue...",
+      );
       Issue myIssue = await readyIssueToUpload();
-      _issueModel.addIssue(myIssue).then((response) {
+      _issueService.addIssue(myIssue).then((response) {
         if (response.statusCode == 201) {
           Issue newIssue = issueFromJson(response.body);
-          Navigator.of(_showLoadingDialogContext, rootNavigator: true).pop();
+          CustomLoading.closeLoading(context: context);
           CustomAlert.alertDialogBuilder(
             context: context,
             title: "Success",
             message: "Your issue reported successfully",
             action: "ok",
           );
-          print(newIssue.Id);
-          print(newIssue.Location);
-          print(newIssue.Image);
+          print(newIssue.id);
+          print(newIssue.location);
+          print(newIssue.image);
           Navigator.of(context).pop();
         } else {
           CustomLoading.closeLoading(context: context);
@@ -129,10 +113,6 @@ class _IssueDetailsState extends State<IssueDetails> {
         _adminArea != null &&
         widget.issueType != null &&
         widget.roadType != null) {
-      CustomLoading.showLoadingDialog(
-        context: context,
-        message: "Reporting your issue...",
-      );
       addNewIssue();
     } else {
       CustomAlert.alertDialogBuilder(
@@ -144,14 +124,8 @@ class _IssueDetailsState extends State<IssueDetails> {
     }
   }
 
-  getUid() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _userId = prefs.getString("uid");
-  }
-
   @override
   Widget build(BuildContext context) {
-    getUid();
     return Scaffold(
       backgroundColor: Color(0xff21254A),
       body: Stack(

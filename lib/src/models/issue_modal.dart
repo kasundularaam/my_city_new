@@ -6,55 +6,60 @@ String issueToJson(Issue data) => json.encode(data.toJson());
 
 class Issue {
   Issue({
-    this.Id,
-    this.Image,
-    this.Lat,
-    this.Long,
-    this.PostalCode,
-    this.Location,
-    this.Status,
-    this.Date,
-    this.RoadType,
-    this.IssueType,
-    this.AdminArea,
+    this.id,
+    this.image,
+    this.lat,
+    this.long,
+    this.postalCode,
+    this.location,
+    this.status,
+    this.date,
+    this.roadType,
+    this.issueType,
+    this.adminArea,
+    this.uid,
   });
 
-  String Id;
-  String Image;
-  double Lat;
-  double Long;
-  int PostalCode;
-  String Location;
-  String Status;
-  String Date;
-  String RoadType;
-  int IssueType;
-  String AdminArea;
+  String id;
+  String image;
+  double lat;
+  double long;
+  int postalCode;
+  String location;
+  String status;
+  String date;
+  String roadType;
+  int issueType;
+  String adminArea;
+  String uid;
 
   factory Issue.fromJson(Map<String, dynamic> json) => Issue(
-        Id: json["id"],
-        Image: json["image"],
-        Lat: json["lat"],
-        Long: json["long"],
-        PostalCode: json["postalCode"],
-        Location: json["location"],
-        Status: json["status"],
-        Date: json["date"],
-        RoadType: json["roadType"],
-        IssueType: json["issueType"],
-        AdminArea: json["adminArea"],
+        id: json["id"],
+        image: json["image"],
+        lat: json["lat"].toDouble(),
+        long: json["long"].toDouble(),
+        postalCode: json["postalCode"],
+        location: json["location"],
+        status: json["status"],
+        date: json["date"],
+        roadType: json["roadType"],
+        issueType: json["issueType"],
+        adminArea: json["adminArea"],
+        uid: json["uid"],
       );
 
   Map<String, dynamic> toJson() => {
-        "image": Image,
-        "lat": Lat,
-        "long": Long,
-        "postalCode": PostalCode,
-        "location": Location,
-        "status": Status,
-        "date": Date,
-        "roadType": RoadType,
-        "issueType": IssueType,
-        "adminArea": AdminArea,
+        "id": id,
+        "image": image,
+        "lat": lat,
+        "long": long,
+        "postalCode": postalCode,
+        "location": location,
+        "status": status,
+        "date": date,
+        "roadType": roadType,
+        "issueType": issueType,
+        "adminArea": adminArea,
+        "uid": uid,
       };
 }

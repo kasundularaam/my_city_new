@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:my_city/src/models/issue_modal.dart';
 import 'package:my_city/src/models/user_modal.dart';
-import 'package:my_city/src/pages/login.dart';
-import 'package:my_city/src/socpe%20model/user_model.dart';
+import 'package:my_city/src/screens/landing_screen.dart';
+import 'package:my_city/src/services/issue_service.dart';
+import 'package:my_city/src/services/user_service.dart';
+import 'package:my_city/src/widgets/custom_alert.dart';
+import 'package:my_city/src/widgets/custom_loading.dart';
+import 'package:my_city/src/widgets/issue_card.dart';
 import 'package:my_city/src/widgets/page_title.dart';
-import 'package:my_city/src/widgets/text_list_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -12,16 +16,130 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  UserModel _userModel = UserModel();
-  String _userId;
-  getUid() async {
+  UserService _userService = UserService();
+  IssueService _issueService = IssueService();
+  List<Issue> _issueList;
+
+  Future<String> getUid() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      return prefs.getString("uid");
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
+  Future<User> getUser() async {
+    try {
+      String uid = await getUid();
+      User user = await _userService.getUserById(uid);
+      return user;
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
+  Future<List<Issue>> getIssuesForUser() async {
+    try {
+      String uid = await getUid();
+      List<Issue> issueList = await _issueService.getIssuesByUid(uid);
+      return issueList;
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
+  logOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _userId = prefs.getString("uid");
+    prefs.setBool("access", false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => LandingScreen(),
+      ),
+      (route) => false,
+    );
+  }
+
+  Future<void> deleteIssue(String issueId, int index) async {
+    CustomLoading.showLoadingDialog(
+      context: context,
+      message: "Deleting...",
+    );
+    try {
+      bool issueDeleted = await _issueService.deleteIssue(issueId);
+      if (issueDeleted) {
+        setState(() {
+          _issueList.removeAt(index);
+        });
+        CustomLoading.closeLoading(context: context);
+        CustomAlert.alertDialogBuilder(
+          context: context,
+          title: "Success",
+          message: "Issue deleted successfully..",
+          action: "Ok",
+        );
+      } else {
+        CustomLoading.closeLoading(context: context);
+        CustomAlert.alertDialogBuilder(
+          context: context,
+          title: "Error",
+          message: "something went wrong..",
+          action: "Ok",
+        );
+      }
+    } catch (e) {
+      CustomLoading.closeLoading(context: context);
+      CustomAlert.alertDialogBuilder(
+        context: context,
+        title: "Error",
+        message: "$e",
+        action: "Ok",
+      );
+    }
+  }
+
+  showDelDialog(String issueId, int index) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Delete"),
+            content: Text("are you sure you want to delete this issue?"),
+            actions: [
+              TextButton(
+                child: Text(
+                  "delete",
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  deleteIssue(issueId, index);
+                  Navigator.pop(context);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  "cancel",
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    getUid();
     return Scaffold(
       backgroundColor: Color(0xff21254A),
       body: ListView(
@@ -29,7 +147,40 @@ class _ProfilePageState extends State<ProfilePage> {
         physics: const BouncingScrollPhysics(),
         children: [
           SizedBox(height: 50),
-          PageTitle(title: "Profile", fontSize: 38),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PageTitle(title: "Profile", fontSize: 38),
+              GestureDetector(
+                onTap: () {
+                  logOut();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 5.0,
+                      ),
+                      Text(
+                        "log out",
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           SizedBox(
             height: 20.0,
           ),
@@ -65,18 +216,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(
-                width: 20.0,
+                width: 10.0,
               ),
               FutureBuilder(
-                future: _userModel.getUserById(_userId),
+                future: getUser(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.hasError) {
                     return Center(
                       child: Text(
-                        "${snapshot.error}",
+                        "Can not load...",
                         style: TextStyle(
                           fontSize: 16.0,
-                          color: Colors.white,
+                          color: Colors.grey,
                         ),
                       ),
                     );
@@ -87,10 +238,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         SizedBox(
-                          height: 20.0,
+                          height: 10.0,
                         ),
                         Text(
-                          user.Name,
+                          user.name,
                           style: TextStyle(
                               fontSize: 22.0,
                               color: Colors.white,
@@ -100,7 +251,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 10.0,
                         ),
                         Text(
-                          user.NIC,
+                          user.nic,
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          user.area,
                           style: TextStyle(
                             fontSize: 18.0,
                             color: Colors.white,
@@ -109,7 +270,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     );
                   }
-                  return Center(child: CircularProgressIndicator());
+                  return Text(
+                    "Loading...",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.grey,
+                    ),
+                  );
                 },
               ),
             ],
@@ -118,12 +285,13 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 30.0,
           ),
           FutureBuilder(
-            future: _userModel.getUserById(_userId),
+            future: getIssuesForUser(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasError) {
                 return Center(
                     child: Text(
                   "${snapshot.error}",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16.0,
                     color: Colors.white,
@@ -131,118 +299,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 ));
               }
               if (snapshot.hasData) {
-                User user = snapshot.data;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Personal info",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            TextListTile(
-                              title: "Name",
-                              subTitle: user.Name,
-                            ),
-                            Divider(
-                              height: 15.0,
-                              color: Colors.purple,
-                            ),
-                            TextListTile(
-                              title: "NIC",
-                              subTitle: user.NIC,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    Text(
-                      "Area info",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            TextListTile(
-                              title: "Admin Area",
-                              subTitle: user.AdminArea,
-                            ),
-                            Divider(
-                              height: 15.0,
-                              color: Colors.purple,
-                            ),
-                            TextListTile(
-                              title: "Postal Code",
-                              subTitle: "${user.PostalCode}",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                _issueList = snapshot.data;
+                return ListView.builder(
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: _issueList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    Issue issue = _issueList[index];
+                    return GestureDetector(
+                      onLongPress: () {
+                        showDelDialog(issue.id, index);
+                      },
+                      child: IssueItemCard(issue: issue, userId: issue.uid),
+                    );
+                  },
                 );
               }
               return Center(child: CircularProgressIndicator());
             },
-          ),
-          SizedBox(
-            height: 30.0,
-          ),
-          Center(
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LogScreen()));
-                print("loged out");
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.logout,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 5.0,
-                    ),
-                    Text(
-                      "log out",
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
           SizedBox(
             height: 30.0,

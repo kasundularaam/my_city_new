@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_city/src/models/user_modal.dart';
-import 'package:my_city/src/screens/main_screen.dart';
-import 'package:my_city/src/socpe%20model/user_model.dart';
+import 'package:my_city/src/screens/landing_screen.dart';
+import 'package:my_city/src/services/user_service.dart';
 import 'package:my_city/src/widgets/custom_alert.dart';
 import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
@@ -9,7 +9,6 @@ import 'package:my_city/src/widgets/page_title.dart';
 import 'package:my_city/src/widgets/round_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/input_field.dart';
-import 'login.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -18,13 +17,12 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   BuildContext showLoadingDialogContext;
-  UserModel _userModel = UserModel();
+  UserService _userService = UserService();
   User _user = User();
 
   String _signinName = "";
   String _signinNIC = "";
   int _signinPostalCode = 0;
-  String _signinType = "abc";
   String _signinAdminArea = "Kottawa";
   String _signinPassword = "";
 
@@ -54,23 +52,25 @@ class _SignUpState extends State<SignUp> {
 
   Future _createNewAccount() async {
     _user = User(
-      Name: _signinName,
-      NIC: _signinNIC,
-      Password: _signinPassword,
-      Type: _signinType,
-      AdminArea: _signinAdminArea,
-      PostalCode: _signinPostalCode,
+      name: _signinName,
+      nic: _signinNIC,
+      password: _signinPassword,
+      area: _signinAdminArea,
+      postalCode: _signinPostalCode,
     );
 
     try {
-      String userId = await _userModel.signUpUser(_user);
+      String userId = await _userService.signUpUser(_user);
       if (userId != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("uid", userId);
-        Navigator.of(context).pushReplacement(
+        prefs.setBool("access", true);
+        Navigator.pushAndRemoveUntil(
+          context,
           MaterialPageRoute(
-            builder: (context) => MainScreen(),
+            builder: (BuildContext context) => LandingScreen(),
           ),
+          (route) => false,
         );
       } else {
         CustomLoading.closeLoading(context: context);
@@ -255,8 +255,7 @@ class _SignUpState extends State<SignUp> {
                 alignment: Alignment.centerRight,
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => LogScreen()));
+                    Navigator.pop(context);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),

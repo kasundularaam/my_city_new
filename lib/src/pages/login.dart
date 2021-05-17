@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_city/src/models/user_modal.dart';
 import 'package:my_city/src/pages/signup.dart';
-import 'package:my_city/src/screens/main_screen.dart';
-import 'package:my_city/src/socpe%20model/user_model.dart';
+import 'package:my_city/src/screens/landing_screen.dart';
+import 'package:my_city/src/services/user_service.dart';
 import 'package:my_city/src/widgets/custom_alert.dart';
 import 'package:my_city/src/widgets/custom_loading.dart';
 import 'package:my_city/src/widgets/page_background.dart';
@@ -18,7 +17,7 @@ class LogScreen extends StatefulWidget {
 
 class _LogScreenState extends State<LogScreen> {
   BuildContext showLoadingDialogContext;
-  UserModel _userModel = UserModel();
+  UserService _userService = UserService();
 
   String _loginNIC = "";
   String _loginPassword = "";
@@ -44,15 +43,18 @@ class _LogScreenState extends State<LogScreen> {
 
   Future _loginAccount() async {
     try {
-      String userId = await _userModel.loginUser(_loginNIC, _loginPassword);
+      String userId = await _userService.loginUser(_loginNIC, _loginPassword);
 
       if (userId != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("uid", userId);
-        Navigator.of(context).pushReplacement(
+        prefs.setBool("access", true);
+        Navigator.pushAndRemoveUntil(
+          context,
           MaterialPageRoute(
-            builder: (context) => MainScreen(),
+            builder: (BuildContext context) => LandingScreen(),
           ),
+          (route) => false,
         );
       } else {
         CustomLoading.closeLoading(context: context);
@@ -159,7 +161,7 @@ class _LogScreenState extends State<LogScreen> {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).pushReplacement(
+                      Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) => SignUp()));
                     },
                     child: Padding(

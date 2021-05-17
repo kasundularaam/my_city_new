@@ -5,7 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:http/http.dart' as http;
 
-class UserModel extends Model {
+class UserService extends Model {
   List<User> parseUsers(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
     return parsed.map<User>((json) => User.fromJson(json)).toList();
@@ -53,10 +53,15 @@ class UserModel extends Model {
   Future<User> getUserById(String uid) async {
     try {
       String url =
-          "https://hivi-99-apigateway-gww2g.ondigitalocean.app/User/GetUserByNic/$uid";
+          "https://hivi-99-apigateway-gww2g.ondigitalocean.app/User/$uid";
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        return userFromJson(response.body);
+        User user = userFromJson(response.body);
+        if (user != null) {
+          return user;
+        } else {
+          throw Exception('User not found');
+        }
       } else {
         throw Exception('${response.statusCode}');
       }
@@ -67,8 +72,8 @@ class UserModel extends Model {
 
   Future<String> loginUser(String nic, String password) async {
     User userForNic = await getUserByNIC(nic);
-    if (userForNic.Password == password) {
-      return userForNic.Id;
+    if (userForNic.password == password) {
+      return userForNic.id;
     } else {
       throw Exception('Password does not match');
     }
@@ -82,7 +87,8 @@ class UserModel extends Model {
           body: userToJson(user));
       if (response.statusCode == 201) {
         User newUser = userFromJson(response.body);
-        return newUser.Id;
+
+        return newUser.id;
       } else {
         throw Exception('${response.statusCode}');
       }
